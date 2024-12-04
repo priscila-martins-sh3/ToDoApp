@@ -1,12 +1,4 @@
-<template>
-    <div class="flex flex-col itens-center mt-8">
-      <todo-form @add-task="addTask" />      
-      <h2 class="flex justify-center font-bold text-gray-800 mb-6">Tarefas Pendentes</h2>      
-      <todo-list v-bind:tasks="tasks" v-bind:showCompleteButton="true" @mark-completed="markAsCompleted" />
-    </div>
-  </template>
-  
-  <script>
+<script>
   import TodoForm from '../components/TodoForm.vue';
   import TodoList from '../components/TodoList.vue';
   
@@ -34,7 +26,14 @@
       },
     },
   };
-  </script>
+</script>
+<template>
+  <div class="flex flex-col itens-center mt-8">
+    <todo-form @add-task="addTask" />      
+    <h2 class="flex justify-center font-bold text-gray-800 mb-6">Tarefas Pendentes</h2>      
+    <todo-list v-bind:tasks="tasks" v-bind:showCompleteButton="true" @mark-completed="markAsCompleted" />
+  </div>
+</template>
   
   
   
