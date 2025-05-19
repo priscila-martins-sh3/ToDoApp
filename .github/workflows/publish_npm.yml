@@ -17,6 +17,8 @@ jobs:
           VERSION=${GITHUB_REF#refs/tags/}
           npm version $VERSION --no-git-tag-version
       - run: |          
+          git config user.name "priscila-martins-sh3"
+          git config user.email "priscila.martins@sh3.com.br"
           git add package.json package-lock.json
           git commit -m "chore(version): version bump ${GITHUB_REF#refs/tags/}"
           git push
