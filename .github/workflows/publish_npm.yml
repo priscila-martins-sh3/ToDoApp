@@ -39,6 +39,30 @@ jobs:
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
-      - run: npm publish
+      - name: Determine npm publish tag
+        id: get_npm_tag
+        run: |
+          # Extrai a versão da tag da GitHub Release (ex: v1.0.0-beta.1 -> 1.0.0-beta.1)
+          FULL_VERSION=${GITHUB_REF#refs/tags/}
+
+          # Inicializa a tag do npm como 'latest'
+          NPM_TAG="latest"
+
+          # Verifica se a versão contém um identificador de pré-lançamento
+          # Usamos uma expressão regular para capturar a parte após o hífen, se houver
+          if [[ "$FULL_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-(.+)$ ]]; then
+            # Pega a parte do pré-lançamento (ex: beta.1, alpha.5)
+            PRERELEASE_ID="${BASH_REMATCH[1]}"
+            
+            # Pega apenas a primeira parte do identificador de pré-lançamento (ex: beta de beta.1)
+            # Isso permite que versões como 1.0.0-beta.1 publiquem na tag beta
+            NPM_TAG=$(echo "$PRERELEASE_ID" | cut -d'.' -f1)
+          fi
+
+          echo "Detected GitHub Release Tag: $FULL_VERSION"
+          echo "Determined npm publish tag: $NPM_TAG"
+          echo "npm_tag=$NPM_TAG" >> $GITHUB_OUTPUT
+        shell: bash
+      - run: npm publish --tag ${{ steps.get_npm_tag.outputs.npm_tag }}
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
