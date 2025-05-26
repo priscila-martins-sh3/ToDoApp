@@ -1,6 +1,6 @@
 {
   "name": "todoweeklyapp",
-  "version": "0.2.11-beta",
+  "version": "0.2.13-alpha.5",
   "type": "module",
   "files": [
     "dist"
