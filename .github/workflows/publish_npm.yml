@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      VERSION: "${{ github.ref_name }}"  
     steps:
       - uses: actions/checkout@v4
         with:
@@ -18,20 +20,19 @@ jobs:
           node-version: 22
           registry-url: https://registry.npmjs.org/      
       - name: Atualizar versão no package.json
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/}
+        run: |       
           npm version $VERSION --no-git-tag-version
       - name: Commit e ou push da nova versão
         run: |          
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add package.json package-lock.json
-          git commit -m "chore(version): version bump ${GITHUB_REF#refs/tags/}"
+          git commit -m "chore(version): version bump $VERSION"
           git push origin main
-      - run: npm ci && npm run build
+      - run: npm ci
+      - run: npm run build
       - name: Publicar no NPM com tag dinâmica   
-        run: |          
-          VERSION=${GITHUB_REF#refs/tags/}          
+        run: |         
           NPM_TAG="latest"          
           if [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-(.+)$ ]]; then            
             PRERELEASE="${BASH_REMATCH[1]}" 
