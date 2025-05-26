@@ -1,8 +1,7 @@
 name: publish to npm
 
 on:
-  release:
-    types: [created] 
+  workflow_dispatch:
 
 jobs:
   build-and-publish:
@@ -17,31 +16,8 @@ jobs:
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org/
-      - run: npm ci 
-      - name: Atualizar versão no package.json
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/}
-          npm version $VERSION --no-git-tag-version
-      - name: Commit e ou push da nova versão
-        run: |          
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add package.json package-lock.json
-          git commit -m "chore(version): version bump ${GITHUB_REF#refs/tags/}"
-          git push origin main
+      - run: npm ci       
       - run: npm run build
-      - name: Publicar no NPM com tag dinâmica   
-        run: |          
-          VERSION=${GITHUB_REF#refs/tags/}          
-          NPM_TAG="latest"          
-          if [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-(.+)$ ]]; then            
-            PRERELEASE="${BASH_REMATCH[1]}" 
-            NPM_TAG=$(echo "$PRERELEASE" | cut -d'.' -f1)                      
-          fi
-
-          echo "GitHub Release Tag: $VERSION"
-          echo "npm publish tag: $NPM_TAG" 
-
-          npm publish --tag $NPM_TAG
+      - run: npm publish 
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
