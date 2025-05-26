@@ -5,7 +5,7 @@ on:
     types: [created] 
 
 jobs:
-  build:
+  build-and-publish:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -29,24 +29,10 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add package.json package-lock.json
           git commit -m "chore(version): version bump $VERSION"
-          git push origin main
-      
+          git push origin main      
       - run: npm run build
-  publish-npm:
-    needs: build
-    runs-on: ubuntu-latest
-    env:
-      VERSION: "${{ github.ref_name }}"  
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          registry-url: https://registry.npmjs.org/
-      - name: Publish to npm with dynamic tag      
-        run: |               
+      - name: Publicar no NPM com tag dinâmica   
+        run: |         
           NPM_TAG="latest"          
           if [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-(.+)$ ]]; then            
             PRERELEASE="${BASH_REMATCH[1]}" 
